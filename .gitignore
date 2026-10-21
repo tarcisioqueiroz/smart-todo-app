@@ -1,0 +1,29 @@
+# ===== Segredos =====
+# Variáveis de ambiente com senhas e chaves nunca vão para o Git.
+.env
+.env.*
+# ...exceto o modelo, que mostra quais variáveis existem (sem valores reais).
+!.env.example
+
+# ===== Go =====
+# Binários compilados (no Windows, o go build gera .exe)
+*.exe
+bin/
+# Arquivos gerados por testes e cobertura
+*.test
+*.out
+coverage.*
+
+# ===== Node / React Native =====
+# Dependências baixadas pelo npm; recriadas com "npm install"
+node_modules/
+
+# ===== Editores e sistema operacional =====
+.idea/
+.vscode/*
+!.vscode/extensions.json
+Thumbs.db
+.DS_Store
+
+# ===== Logs =====
+*.log

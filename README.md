@@ -16,3 +16,7 @@ Um app de gerenciamento de tarefas multiplataforma integrado com inteligência a
 
 ### backend
 - Entre no diretorio backend e rode o comando go run ./cmd/api
+
+### Frontend
+- entre na pasta mobile,execute npm install para instalar as dependências;
+- No mesmo diretório rode o comando npx expo start para iniciar o servidor metro do expo, que deixara o app disponível para ser executado via emuladores ou aplicativo mobile Expo GO;

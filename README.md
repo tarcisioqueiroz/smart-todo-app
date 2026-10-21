@@ -9,3 +9,6 @@ Um app de gerenciamento de tarefas multiplataforma integrado com inteligência a
 - PostgreSQL;
 
 ## Como executar
+
+- Na raiz do projeto, crie o arquivo .env copiando o modelo do arquivo .env.exemplo;
+- Após isso, rode o comando docker compose up -d.

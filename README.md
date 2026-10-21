@@ -10,5 +10,5 @@ Um app de gerenciamento de tarefas multiplataforma integrado com inteligência a
 
 ## Como executar
 
-- Na raiz do projeto, crie o arquivo .env copiando o modelo do arquivo .env.exemplo;
+- Na raiz do projeto, crie o arquivo .env copiando o modelo do arquivo .env.example;
 - Após isso, rode o comando docker compose up -d.

@@ -10,5 +10,9 @@ Um app de gerenciamento de tarefas multiplataforma integrado com inteligência a
 
 ## Como executar
 
+### banco de dados
 - Na raiz do projeto, crie o arquivo .env copiando o modelo do arquivo .env.example;
 - Após isso, rode o comando docker compose up -d.
+
+### backend
+- Entre no diretorio backend e rode o comando go run ./cmd/api

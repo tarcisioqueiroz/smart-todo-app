@@ -4,7 +4,7 @@ import (
 	"encoding/json"
 	"log/slog"
 	"net/http"
-	"strconv"
+	"strings"
 )
 
 type Handler struct {
@@ -12,7 +12,7 @@ type Handler struct {
 }
 
 type createTaskInput struct {
-	Title       string `json:"title"`
+	Title string `json:"title"`
 }
 
 func NewHandler(store *Store) *Handler {
@@ -20,15 +20,25 @@ func NewHandler(store *Store) *Handler {
 }
 
 func (h *Handler) Create(w http.ResponseWriter, r *http.Request) {
-	w.Header().Set("Content-Type", "application/json")
-	w.WriteHeader(http.StatusCreated)
 
 	var input createTaskInput
-	strconv.Itoa(input.Title)
 	if err := json.NewDecoder(r.Body).Decode(&input); err != nil {
 		slog.Error("Falha ao decodificar entrada", "error", err)
-		http.Error(w, "", http.StatusBadRequest)
+		http.Error(w, "Json inválido", http.StatusBadRequest)
 		return
+	}
+
+	titleTrim := strings.TrimSpace(input.Title)
+	if titleTrim == "" {
+		http.Error(w, "Título da tarefa não pode ser vazio", http.StatusBadRequest)
+		return
+	}
+
+	t := h.store.Create(titleTrim)
+	w.Header().Set("Content-Type", "application/json")
+	w.WriteHeader(http.StatusCreated)
+	if err := json.NewEncoder(w).Encode(t); err != nil {
+		slog.Error("Falha ao escrever resposta", "error", err)
 	}
 }
 

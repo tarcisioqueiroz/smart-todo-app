@@ -12,14 +12,13 @@ func main() {
 	logger := slog.New(slog.NewJSONHandler(os.Stdout, nil))
 	slog.SetDefault(logger)
 
-	s := task.NewStore()
-	s.Create("estudar go")
-	s.Create("escovar-se")
-	h := task.NewHandler(s)
+	store := task.NewStore()
+	handlerTasks := task.NewHandler(store)
 
 	mux := http.NewServeMux()
 	mux.HandleFunc("GET /health", healthHandler)
-	mux.HandleFunc("GET /tasks", h.List)
+	mux.HandleFunc("GET /tasks", handlerTasks.List)
+	mux.HandleFunc("POST /tasks", handlerTasks.Create)
 
 	port := getEnv("PORT", "8080")
 	addr := ":" + port

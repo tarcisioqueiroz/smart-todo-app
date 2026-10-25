@@ -6,8 +6,8 @@ import (
 )
 
 type Store struct {
-	mu sync.Mutex
-	tasks []Task
+	mu     sync.Mutex
+	tasks  []Task
 	nextID int
 }
 

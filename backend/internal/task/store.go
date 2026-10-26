@@ -1,6 +1,7 @@
 package task
 
 import (
+	"slices"
 	"sync"
 	"time"
 )
@@ -44,4 +45,17 @@ func (s *Store) Get(id int) (Task, bool) {
 		}
 	}
 	return Task{}, false
+}
+
+func (s *Store) Delete(id int) bool {
+	s.mu.Lock()
+	defer s.mu.Unlock()
+
+	for i, t := range s.tasks {
+		if t.ID == id {
+			s.tasks = slices.Delete(s.tasks, i, i+1)
+			return true
+		}
+	}
+	return false
 }

@@ -19,6 +19,7 @@ func main() {
 	mux.HandleFunc("GET /health", healthHandler)
 	mux.HandleFunc("GET /tasks", handlerTasks.List)
 	mux.HandleFunc("POST /tasks", handlerTasks.Create)
+	mux.HandleFunc("GET /tasks/{id}", handlerTasks.GetTask)
 
 	port := getEnv("PORT", "8080")
 	addr := ":" + port

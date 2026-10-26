@@ -33,3 +33,15 @@ func (s *Store) List() []Task {
 	copy(out, s.tasks)
 	return out
 }
+
+func (s *Store) Get(id int) (Task, bool) {
+	s.mu.Lock()
+	defer s.mu.Unlock()
+
+	for _, t := range s.tasks {
+		if t.ID == id {
+			return t, true
+		}
+	}
+	return Task{}, false
+}

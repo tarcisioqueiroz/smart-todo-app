@@ -4,6 +4,7 @@ import (
 	"encoding/json"
 	"log/slog"
 	"net/http"
+	"strconv"
 	"strings"
 )
 
@@ -49,3 +50,25 @@ func (h *Handler) List(w http.ResponseWriter, r *http.Request) {
 		slog.Error("Falha ao escrever resposta", "error", err)
 	}
 }
+
+func (h *Handler) GetTask(w http.ResponseWriter, r *http.Request) {
+	idText := r.PathValue("id")
+
+	id, err := strconv.Atoi(idText)
+	if err != nil {
+		http.Error(w, "id inválido", http.StatusBadRequest)
+		return
+	}
+
+	t, ok := h.store.Get(id)
+	if !ok {
+		http.Error(w, "id não encontrado", http.StatusNotFound)
+		return
+	}
+	w.Header().Set("Content-Type", "application/json")
+	w.WriteHeader(http.StatusOK)
+	if err := json.NewEncoder(w).Encode(t); err != nil {
+		slog.Error("Falha ao escrever resposta", "error", err)
+	}
+}
+

@@ -72,3 +72,20 @@ func (h *Handler) GetTask(w http.ResponseWriter, r *http.Request) {
 	}
 }
 
+func (h *Handler) DeleteTask(w http.ResponseWriter, r *http.Request) {
+	idText := r.PathValue("id")
+
+	id, err := strconv.Atoi(idText)
+	if err != nil {
+		http.Error(w, "id inválido", http.StatusBadRequest)
+		return
+	}
+
+	if !h.store.Delete(id) {
+		http.Error(w, "tarefa não encontrada", http.StatusNotFound)
+		return
+	}
+
+	w.WriteHeader(http.StatusNoContent)
+
+}

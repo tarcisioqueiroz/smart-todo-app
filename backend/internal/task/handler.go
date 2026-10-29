@@ -110,6 +110,11 @@ func (h *Handler) UpdateTask(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
+	if input.Title == nil && input.Done == nil {
+		http.Error(w, "informe title ou done", http.StatusBadRequest)
+		return
+	}
+
 	if input.Title != nil {
 		trimmed := strings.TrimSpace(*input.Title)
 		if trimmed == "" {

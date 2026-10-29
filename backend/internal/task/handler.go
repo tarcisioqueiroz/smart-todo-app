@@ -16,6 +16,11 @@ type createTaskInput struct {
 	Title string `json:"title"`
 }
 
+type updateTaskInput struct {
+	Title *string `json:"title"`
+	Done  *bool   `json:"done"`
+}
+
 func NewHandler(store *Store) *Handler {
 	return &Handler{store: store}
 }
@@ -88,4 +93,41 @@ func (h *Handler) DeleteTask(w http.ResponseWriter, r *http.Request) {
 
 	w.WriteHeader(http.StatusNoContent)
 
+}
+
+func (h *Handler) UpdateTask(w http.ResponseWriter, r *http.Request) {
+	idText := r.PathValue("id")
+
+	id, err := strconv.Atoi(idText)
+	if err != nil {
+		http.Error(w, "id inválido", http.StatusBadRequest)
+		return
+	}
+
+	var input updateTaskInput
+	if err := json.NewDecoder(r.Body).Decode(&input); err != nil {
+		http.Error(w, "Json inválido", http.StatusBadRequest)
+		return
+	}
+
+	if input.Title != nil {
+		trimmed := strings.TrimSpace(*input.Title)
+		if trimmed == "" {
+			http.Error(w, "o título não pode ser vazio", http.StatusBadRequest)
+			return
+		}
+		input.Title = &trimmed
+	}
+
+	t, ok := h.store.Update(id, input.Title, input.Done)
+	if !ok {
+		http.Error(w, "tarefa não encontrada", http.StatusNotFound)
+		return
+	}
+
+	w.Header().Set("Content-Type", "application/json")
+	w.WriteHeader(http.StatusOK)
+	if err := json.NewEncoder(w).Encode(t); err != nil {
+		slog.Error("Falha ao escrever resposta", "error", err)
+	}
 }

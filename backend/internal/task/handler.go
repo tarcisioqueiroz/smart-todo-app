@@ -25,18 +25,6 @@ func NewHandler(store *Store) *Handler {
 	return &Handler{store: store}
 }
 
-func parseId(w http.ResponseWriter, r *http.Request) (int, bool) {
-	idText := r.PathValue("id")
-
-	id, err := strconv.Atoi(idText)
-	if err != nil {
-		http.Error(w, "id inválido", http.StatusBadRequest)
-		return id, false
-	}
-
-	return id, true
-}
-
 func (h *Handler) Create(w http.ResponseWriter, r *http.Request) {
 
 	var input createTaskInput
@@ -53,19 +41,11 @@ func (h *Handler) Create(w http.ResponseWriter, r *http.Request) {
 	}
 
 	t := h.store.Create(titleTrim)
-	w.Header().Set("Content-Type", "application/json")
-	w.WriteHeader(http.StatusCreated)
-	if err := json.NewEncoder(w).Encode(t); err != nil {
-		slog.Error("Falha ao escrever resposta", "error", err)
-	}
+	writeJSON(w, http.StatusCreated, t)
 }
 
 func (h *Handler) List(w http.ResponseWriter, r *http.Request) {
-	w.Header().Set("Content-Type", "application/json")
-	w.WriteHeader(http.StatusOK)
-	if err := json.NewEncoder(w).Encode(h.store.List()); err != nil {
-		slog.Error("Falha ao escrever resposta", "error", err)
-	}
+	writeJSON(w, http.StatusOK, h.store.List())
 }
 
 func (h *Handler) GetTask(w http.ResponseWriter, r *http.Request) {
@@ -79,11 +59,8 @@ func (h *Handler) GetTask(w http.ResponseWriter, r *http.Request) {
 		http.Error(w, "id não encontrado", http.StatusNotFound)
 		return
 	}
-	w.Header().Set("Content-Type", "application/json")
-	w.WriteHeader(http.StatusOK)
-	if err := json.NewEncoder(w).Encode(t); err != nil {
-		slog.Error("Falha ao escrever resposta", "error", err)
-	}
+
+	writeJSON(w, http.StatusOK, t)
 }
 
 func (h *Handler) DeleteTask(w http.ResponseWriter, r *http.Request) {
@@ -133,9 +110,25 @@ func (h *Handler) UpdateTask(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
+	writeJSON(w, http.StatusOK, t)
+}
+
+func parseId(w http.ResponseWriter, r *http.Request) (int, bool) {
+	idText := r.PathValue("id")
+
+	id, err := strconv.Atoi(idText)
+	if err != nil {
+		http.Error(w, "id inválido", http.StatusBadRequest)
+		return id, false
+	}
+
+	return id, true
+}
+
+func writeJSON(w http.ResponseWriter, status int, data any) {
 	w.Header().Set("Content-Type", "application/json")
-	w.WriteHeader(http.StatusOK)
-	if err := json.NewEncoder(w).Encode(t); err != nil {
+	w.WriteHeader(status)
+	if err := json.NewEncoder(w).Encode(data); err != nil {
 		slog.Error("Falha ao escrever resposta", "error", err)
 	}
 }

@@ -2,6 +2,7 @@ package task
 
 import (
 	"encoding/json"
+	"errors"
 	"log/slog"
 	"net/http"
 	"strconv"
@@ -145,6 +146,11 @@ func decodeJSON(w http.ResponseWriter, r *http.Request, dst any) bool {
 	dec.DisallowUnknownFields()
 	if err := dec.Decode(dst); err != nil {
 		slog.Warn("corpo da requisição inválido", "error", err)
+		var maxErr *http.MaxBytesError
+		if errors.As(err, &maxErr) {
+			writeError(w, http.StatusRequestEntityTooLarge, "corpo da requisição muito grande")
+			return false
+		}
 		writeError(w, http.StatusBadRequest, "JSON inválido")
 		return false
 	}

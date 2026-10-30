@@ -43,6 +43,7 @@ func (h *Handler) Create(w http.ResponseWriter, r *http.Request) {
 	}
 
 	t := h.store.Create(titleTrim)
+	w.Header().Set("Location", "/tasks/"+strconv.Itoa(t.ID))
 	writeJSON(w, http.StatusCreated, t)
 }
 
@@ -143,6 +144,7 @@ func decodeJSON(w http.ResponseWriter, r *http.Request, dst any) bool {
 	dec := json.NewDecoder(r.Body)
 	dec.DisallowUnknownFields()
 	if err := dec.Decode(dst); err != nil {
+		slog.Warn("corpo da requisição inválido", "error", err)
 		writeError(w, http.StatusBadRequest, "JSON inválido")
 		return false
 	}

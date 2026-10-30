@@ -21,7 +21,7 @@ type updateTaskInput struct {
 	Done  *bool   `json:"done"`
 }
 
-type erroResponse struct {
+type errorResponse struct {
 	Error string `json:"error"`
 }
 
@@ -32,9 +32,7 @@ func NewHandler(store *Store) *Handler {
 func (h *Handler) Create(w http.ResponseWriter, r *http.Request) {
 
 	var input createTaskInput
-	if err := json.NewDecoder(r.Body).Decode(&input); err != nil {
-		slog.Error("Falha ao decodificar entrada", "error", err)
-		writeError(w, http.StatusBadRequest, "Json inválido")
+	if !decodeJSON(w, r, &input) {
 		return
 	}
 
@@ -53,7 +51,7 @@ func (h *Handler) List(w http.ResponseWriter, r *http.Request) {
 }
 
 func (h *Handler) GetTask(w http.ResponseWriter, r *http.Request) {
-	id, ok := parseId(w, r)
+	id, ok := parseID(w, r)
 	if !ok {
 		return
 	}
@@ -68,7 +66,7 @@ func (h *Handler) GetTask(w http.ResponseWriter, r *http.Request) {
 }
 
 func (h *Handler) DeleteTask(w http.ResponseWriter, r *http.Request) {
-	id, ok := parseId(w, r)
+	id, ok := parseID(w, r)
 	if !ok {
 		return
 	}
@@ -83,14 +81,13 @@ func (h *Handler) DeleteTask(w http.ResponseWriter, r *http.Request) {
 }
 
 func (h *Handler) UpdateTask(w http.ResponseWriter, r *http.Request) {
-	id, ok := parseId(w, r)
+	id, ok := parseID(w, r)
 	if !ok {
 		return
 	}
 
 	var input updateTaskInput
-	if err := json.NewDecoder(r.Body).Decode(&input); err != nil {
-		writeError(w, http.StatusBadRequest, "Json inválido")
+	if !decodeJSON(w, r, &input) {
 		return
 	}
 
@@ -102,7 +99,7 @@ func (h *Handler) UpdateTask(w http.ResponseWriter, r *http.Request) {
 	if input.Title != nil {
 		trimmed := strings.TrimSpace(*input.Title)
 		if trimmed == "" {
-			writeError(w, http.StatusBadRequest, "o título não pode ser vazio")
+			writeError(w, http.StatusBadRequest, "Título da tarefa não pode ser vazio")
 			return
 		}
 		input.Title = &trimmed
@@ -117,13 +114,13 @@ func (h *Handler) UpdateTask(w http.ResponseWriter, r *http.Request) {
 	writeJSON(w, http.StatusOK, t)
 }
 
-func parseId(w http.ResponseWriter, r *http.Request) (int, bool) {
+func parseID(w http.ResponseWriter, r *http.Request) (int, bool) {
 	idText := r.PathValue("id")
 
 	id, err := strconv.Atoi(idText)
 	if err != nil {
 		writeError(w, http.StatusBadRequest, "id inválido")
-		return id, false
+		return 0, false
 	}
 
 	return id, true
@@ -138,5 +135,16 @@ func writeJSON(w http.ResponseWriter, status int, data any) {
 }
 
 func writeError(w http.ResponseWriter, status int, message string) {
-	writeJSON(w, status, erroResponse{Error: message})
+	writeJSON(w, status, errorResponse{Error: message})
+}
+
+func decodeJSON(w http.ResponseWriter, r *http.Request, dst any) bool {
+	r.Body = http.MaxBytesReader(w, r.Body, 1<<20)
+	dec := json.NewDecoder(r.Body)
+	dec.DisallowUnknownFields()
+	if err := dec.Decode(dst); err != nil {
+		writeError(w, http.StatusBadRequest, "JSON inválido")
+		return false
+	}
+	return true
 }

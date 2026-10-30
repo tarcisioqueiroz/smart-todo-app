@@ -25,6 +25,18 @@ func NewHandler(store *Store) *Handler {
 	return &Handler{store: store}
 }
 
+func parseId(w http.ResponseWriter, r *http.Request) (int, bool) {
+	idText := r.PathValue("id")
+
+	id, err := strconv.Atoi(idText)
+	if err != nil {
+		http.Error(w, "id inválido", http.StatusBadRequest)
+		return id, false
+	}
+
+	return id, true
+}
+
 func (h *Handler) Create(w http.ResponseWriter, r *http.Request) {
 
 	var input createTaskInput
@@ -57,11 +69,8 @@ func (h *Handler) List(w http.ResponseWriter, r *http.Request) {
 }
 
 func (h *Handler) GetTask(w http.ResponseWriter, r *http.Request) {
-	idText := r.PathValue("id")
-
-	id, err := strconv.Atoi(idText)
-	if err != nil {
-		http.Error(w, "id inválido", http.StatusBadRequest)
+	id, ok := parseId(w, r)
+	if !ok {
 		return
 	}
 
@@ -78,11 +87,8 @@ func (h *Handler) GetTask(w http.ResponseWriter, r *http.Request) {
 }
 
 func (h *Handler) DeleteTask(w http.ResponseWriter, r *http.Request) {
-	idText := r.PathValue("id")
-
-	id, err := strconv.Atoi(idText)
-	if err != nil {
-		http.Error(w, "id inválido", http.StatusBadRequest)
+	id, ok := parseId(w, r)
+	if !ok {
 		return
 	}
 
@@ -96,11 +102,8 @@ func (h *Handler) DeleteTask(w http.ResponseWriter, r *http.Request) {
 }
 
 func (h *Handler) UpdateTask(w http.ResponseWriter, r *http.Request) {
-	idText := r.PathValue("id")
-
-	id, err := strconv.Atoi(idText)
-	if err != nil {
-		http.Error(w, "id inválido", http.StatusBadRequest)
+	id, ok := parseId(w, r)
+	if !ok {
 		return
 	}
 

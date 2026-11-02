@@ -38,7 +38,7 @@ func TestGetUnknownTaskReturns404JSON(t *testing.T) {
 	}
 
 	if rec.Header().Get("Content-Type") != "application/json" {
-		t.Errorf("status = %q, esperado %q", rec.Header().Get("Content-Type"), "application/json")
+		t.Errorf("content-type = %q, esperado %q", rec.Header().Get("Content-Type"), "application/json")
 	}
 
 	var resp errorResponse

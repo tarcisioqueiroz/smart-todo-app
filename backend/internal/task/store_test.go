@@ -23,7 +23,7 @@ func TestGetUnknownIDReturnsFalse(t *testing.T) {
 	s := NewStore()
 	_, ok := s.Get(99)
 	if ok {
-		t.Errorf("Bsuca tarefa com ID desconhecido: \nesperado: %v\nretornou: %v", false, ok)
+		t.Errorf("Get(99): ok = %v, esperado false", ok)
 	}
 }
 

@@ -28,7 +28,7 @@ func TestCreateReturns201WithLocation(t *testing.T) {
 		t.Fatalf("corpo não é JSON válido: %v", err)
 	}
 	if created.Title != "estudar go" {
-		t.Errorf("titulo %q, esperado %q", created.Title, "estudar go")
+		t.Errorf("título = %q, esperado %q", created.Title, "estudar go")
 	}
 }
 

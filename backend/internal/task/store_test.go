@@ -31,10 +31,19 @@ func TestUpdateKeepsFieldsNotSent(t *testing.T) {
 	s := NewStore()
 	t1 := s.Create("tarefa 1")
 	done := true
-	s.Update(t1.ID, nil, &done)
+	_, ok := s.Update(t1.ID, nil, &done)
+	if !ok {
+		t.Fatalf("Update (done): tarefa não encontrada")
+	}
 
 	title := "novo title"
-	s.Update(t1.ID, &title, nil)
+	updated, ok := s.Update(t1.ID, &title, nil)
+	if !ok {
+		t.Fatalf("Update (title): tarefa não encontrada")
+	}
+	if updated.Title != title {
+		t.Errorf("Update devolveu Title = %q, esperado %q", updated.Title, title)
+	}
 
 	got, ok := s.Get(t1.ID)
 
@@ -47,5 +56,14 @@ func TestUpdateKeepsFieldsNotSent(t *testing.T) {
 
 	if !got.Done {
 		t.Errorf("Done = %v, esperado true", got.Done)
+	}
+}
+
+func TestUpdateUnknownIDReturnsFalse(t *testing.T) {
+	s := NewStore()
+	done := true
+	_, ok := s.Update(99, nil, &done)
+	if ok {
+		t.Errorf("Update(99): ok = true, esperado false")
 	}
 }

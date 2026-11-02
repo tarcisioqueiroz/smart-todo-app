@@ -54,6 +54,6 @@ func TestGetUnknownTaskReturns404JSON(t *testing.T) {
 	}
 
 	if resp.Error != "tarefa não encontrada" {
-		t.Errorf("error: %q, esperado %q", resp.Error, "tarefa não encontrada")
+		t.Errorf("error = %q, esperado %q", resp.Error, "tarefa não encontrada")
 	}
 }

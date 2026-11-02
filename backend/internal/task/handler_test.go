@@ -23,6 +23,13 @@ func TestCreateReturns201WithLocation(t *testing.T) {
 	if got := rec.Header().Get("Location"); got != "/tasks/1" {
 		t.Errorf("location = %q, esperado %q", got, "/tasks/1")
 	}
+	var created Task
+	if err := json.NewDecoder(rec.Body).Decode(&created); err != nil {
+		t.Fatalf("corpo não é JSON válido: %v", err)
+	}
+	if created.Title != "estudar go" {
+		t.Errorf("titulo %q, esperado %q", created.Title, "estudar go")
+	}
 }
 
 func TestGetUnknownTaskReturns404JSON(t *testing.T) {

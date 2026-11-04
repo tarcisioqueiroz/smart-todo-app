@@ -20,3 +20,20 @@ Um app de gerenciamento de tarefas multiplataforma integrado com inteligência a
 ### Frontend
 - entre na pasta mobile,execute `npm install` para instalar as dependências;
 - No mesmo diretório rode o comando `npx expo start` para iniciar o servidor metro do expo, que deixara o app disponível para ser executado via emuladores ou aplicativo mobile Expo GO;
+
+### Migrations
+
+Instale o goose (uma vez por computador):
+
+```powershell
+go install github.com/pressly/goose/v3/cmd/goose@latest
+```
+
+Dentro de `backend/`, com o banco rodando:
+
+```powershell
+$env:GOOSE_DRIVER = "postgres"
+$env:GOOSE_DBSTRING = "postgres://USUARIO:SENHA@localhost:5432/BANCO?sslmode=disable"
+$env:GOOSE_MIGRATION_DIR = "migrations"
+goose up
+```
